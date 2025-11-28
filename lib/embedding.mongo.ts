@@ -101,7 +101,7 @@ EmbeddingSchema.statics.findSimilar = function (
   const pipeline: PipelineStage[] = [
     {
       $vectorSearch: {
-        index: "dreamcatcher_vector_index",
+        index: "vector_index",
         queryVector: embedding,
         path: "embedding",
         numCandidates,
