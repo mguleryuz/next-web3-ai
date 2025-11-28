@@ -1,7 +1,21 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-export const UserSchema = new Schema({
-  wallet_address: { type: String, required: true, unique: true },
+// Interface for the User document
+export interface IUser {
+  wallet_address: string;
+}
+
+export interface IUserDocument extends IUser, Document {
+  _id: Types.ObjectId;
+}
+
+export type IUserModel = Model<IUserDocument>;
+
+// Schema definition
+const UserSchema = new Schema<IUserDocument>({
+  wallet_address: { type: String, required: true, unique: true, index: true },
 });
 
-export const UserModel = model("users", UserSchema);
+export const UserModel =
+  (mongoose.models.users as IUserModel) ||
+  mongoose.model<IUserDocument, IUserModel>("users", UserSchema);
