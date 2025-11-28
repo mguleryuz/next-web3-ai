@@ -1,20 +1,12 @@
 import NextAuth from "next-auth";
-import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { validateJWT } from "@/lib/auth-helpers";
+import dbConnect from "@/lib/mongodb";
+import { UserModel } from "@/lib/user.mongo";
+import { authConfig, extractWalletAddress, type DynamicJwtPayload } from "./auth.config";
 
-declare module "next-auth" {
-  interface User {
-    id: string;
-    name: string;
-    email: string;
-  }
-}
-
-export const config = {
-  theme: {
-    logo: "https://next-auth.js.org/img/logo/logo-sm.png",
-  },
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       name: "Credentials",
@@ -27,26 +19,35 @@ export const config = {
           throw new Error("Token is required");
         }
 
-        const jwtPayload = await validateJWT(token);
+        const jwtPayload = (await validateJWT(token)) as DynamicJwtPayload | null;
 
-        if (jwtPayload) {
-          return {
-            id: jwtPayload.sub || "",
-            name: jwtPayload.name || "",
-            email: jwtPayload.email || "",
-          };
+        if (!jwtPayload) {
+          return null;
         }
-        return null;
+
+        const walletAddress = extractWalletAddress(jwtPayload);
+
+        if (!walletAddress) {
+          console.error("No wallet address found in JWT payload");
+          return null;
+        }
+
+        // Connect to database and create/find user
+        await dbConnect();
+
+        const user = await UserModel.findOrCreateByWallet(walletAddress, {
+          dynamic_user_id: jwtPayload.sub,
+          email: jwtPayload.email,
+          name: jwtPayload.name,
+        });
+
+        return {
+          id: user._id.toString(),
+          name: user.name || "",
+          email: user.email || "",
+          walletAddress: user.wallet_address,
+        };
       },
     }),
   ],
-  callbacks: {
-    authorized({ auth, request }) {
-      const { pathname } = request.nextUrl;
-      if (pathname === "/middleware-example") return !!auth;
-      return true;
-    },
-  },
-} satisfies NextAuthConfig;
-
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+});
