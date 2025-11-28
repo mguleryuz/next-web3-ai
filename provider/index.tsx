@@ -9,6 +9,7 @@ import { mainnet, sepolia, optimism, arbitrum, base, polygon } from "viem/chains
 import {
   DynamicContextProvider,
   getAuthToken,
+  DynamicUserProfile
 } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
 import { DynamicWagmiConnector } from "@dynamic-labs/wagmi-connector";
@@ -76,7 +77,9 @@ export default function Provider({ children }: React.PropsWithChildren) {
     >
       <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <DynamicWagmiConnector>{children}</DynamicWagmiConnector>
+          <DynamicWagmiConnector>{children}
+          <DynamicUserProfile />
+          </DynamicWagmiConnector>
         </QueryClientProvider>
       </WagmiProvider>
     </DynamicContextProvider>
