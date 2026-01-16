@@ -1,11 +1,10 @@
 'use client'
 
 import { getIconSrc, useChainSpecs } from '@/hooks/use-chain-specs'
-import { cn } from '@/lib/utils'
+import { cn } from 'liquidcn'
 import { Check, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import type { ButtonProps } from './ui/button'
-import { Button } from './ui/button'
+import { Button, type ButtonProps } from 'liquidcn'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from './ui/dialog'
+} from 'liquidcn/client'
 
 interface ChainSelectorDialogContentProps {
   chains: ReturnType<typeof useChainSpecs>['networkConfigurations']

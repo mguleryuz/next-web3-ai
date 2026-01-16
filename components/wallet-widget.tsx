@@ -1,14 +1,13 @@
 'use client'
 
 import { useChainSpecs } from '@/hooks/use-chain-specs'
-import { cn } from '@/lib/utils'
+import { cn } from 'liquidcn'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { signOut } from 'next-auth/react'
 import { Loader2, LogOut, Wallet } from 'lucide-react'
 
 // import { ChainSelectorButton } from './chain-selector'
-import type { ButtonProps } from './ui/button'
-import { Button } from './ui/button'
+import { Button, type ButtonProps } from 'liquidcn'
 
 const compressAddress = (address?: string) => {
   if (!address) return '...'
